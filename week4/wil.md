@@ -34,6 +34,7 @@ from sklearn.linear_model import LogisticRegression
 로지스틱 회귀는 입력 데이터를 바탕으로 각 클래스에 속할 확률을 계산하고, 그중 가장 확률이 높은 클래스를 최종 예측값으로 선택한다.
 
 즉, 단순히 "이 생선은 Bream이다"라고만 알려주는 것이 아니라, 각 생선 종류별로 어느 정도의 확률을 가지는지도 확인할 수 있다.
+
 ```python
 lr.predict(test_data_scaled)
 lr.predict_proba(test_data_scaled)
@@ -43,49 +44,49 @@ lr.predict_proba(test_data_scaled)
 
 이번 과제에서는 새로운 생선 데이터 5개를 넣고, 각각 어떤 생선으로 예측되는지와 7종의 생선에 대한 확률을 확인하였다.
 
-##3. 데이터 준비
+
+## 3. 데이터 준비
 
 이번 실습에서는 fish_csv_data 데이터를 사용하였다.
-
+```python
 fish = pd.read_csv('http://bit.ly/fish_csv_data')
-
+```
 입력 데이터는 다음 5개의 특성으로 구성하였다.
-
+```python
 fish_input = fish[['Weight', 'Length', 'Diagonal', 'Height', 'Width']]
-
+```
 타깃 데이터는 생선의 종류이다.
-
+```python
 fish_target = fish['Species']
-
+```
 여기서 입력 데이터는 모델이 예측을 위해 참고하는 값이고, 타깃 데이터는 모델이 맞춰야 하는 정답이다.
 
 즉, Weight, Length, Diagonal, Height, Width를 보고 Species를 예측하는 문제이다.
 
-4. 훈련 세트와 테스트 세트 분리
+## 4. 훈련 세트와 테스트 세트 분리
 
 모델을 제대로 평가하기 위해 훈련 세트와 테스트 세트를 분리하였다.
-
+```python
 train_input, test_input, train_target, test_target = train_test_split(
     fish_input,
     fish_target,
     random_state=42
 )
-
+```
 훈련 세트는 모델이 학습하는 데이터이고, 테스트 세트는 모델이 학습하지 않은 데이터로 성능을 평가하기 위한 데이터이다.
 
 이전 주차에서도 배웠듯이, 모델이 이미 본 데이터로만 평가하면 성능이 실제보다 좋게 나올 수 있다.
 따라서 모델이 새로운 데이터에도 잘 작동하는지 확인하려면 훈련 데이터와 테스트 데이터를 분리해야 한다.
 
-5. 표준화
+## 5. 표준화
 
 이번 데이터는 특성이 여러 개이기 때문에 표준화 과정이 필요했다.
-
+```python
 ss = StandardScaler()
 ss.fit(train_input)
-
 train_scaled = ss.transform(train_input)
 test_scaled = ss.transform(test_input)
-
+```
 표준화는 각 특성의 스케일을 맞춰주는 과정이다.
 
 예를 들어 무게는 수백 단위의 값이 될 수 있지만, 너비나 높이는 상대적으로 작은 값을 가진다.
@@ -94,15 +95,15 @@ test_scaled = ss.transform(test_input)
 그래서 StandardScaler를 사용해 평균과 표준편차를 기준으로 데이터를 변환하였다.
 
 중요한 점은 테스트 세트와 새로운 데이터도 훈련 세트에서 계산한 평균과 표준편차를 기준으로 변환해야 한다는 것이다.
-
+```python
 test_data_scaled = ss.transform(test_data)
-
+```
 모델이 표준화된 데이터로 학습했기 때문에, 새로운 데이터도 같은 방식으로 표준화해야 올바른 예측을 할 수 있다.
 
-6. 새로운 데이터 예측
+## 6. 새로운 데이터 예측
 
 과제에서 주어진 새로운 데이터는 다음과 같다.
-
+```python
 test_data = np.array([
     [350.0, 29.0, 33.5, 10.50, 4.60],
     [18.5, 12.5, 14.0, 2.30, 1.35],
@@ -110,58 +111,60 @@ test_data = np.array([
     [160.0, 21.0, 23.5, 6.20, 3.60],
     [550.0, 26.5, 31.0, 13.80, 6.10]
 ])
-
+```
 이 데이터도 기존 입력 데이터와 동일하게 Weight, Length, Diagonal, Height, Width 순서로 구성되어 있다.
 
 새로운 데이터를 로지스틱 회귀 모델에 넣기 전에 먼저 표준화를 진행하였다.
-
+``python
 test_data_scaled = ss.transform(test_data)
-
+```
 그리고 예측 결과를 확인하였다.
-
+```python
 predictions = lr.predict(test_data_scaled)
-
+```
 또한 각 생선 종류별 확률도 확인하였다.
-
+```python
 proba = lr.predict_proba(test_data_scaled)
-
+```
 이번 실습을 통해 예측값만 확인하는 것보다 확률값까지 확인하는 것이 더 좋다고 느꼈다.
 예측 결과가 같더라도 어떤 경우는 확률이 매우 높을 수 있고, 어떤 경우는 여러 클래스의 확률이 비슷할 수 있기 때문이다.
 
 따라서 predict_proba()를 같이 사용하면 모델이 얼마나 확신을 가지고 예측했는지 확인할 수 있다.
 
-7. SGDClassifier
+## 7. SGDClassifier
 
 두 번째 과제에서는 SGDClassifier를 사용하였다.
-
+```python
 from sklearn.linear_model import SGDClassifier
-
+```
 SGDClassifier는 확률적 경사 하강법을 사용하는 분류 모델이다.
 데이터를 사용해 모델을 조금씩 업데이트하면서 학습하는 방식이다.
 
 이번 과제에서는 loss 파라미터를 hinge로 설정하였다.
-
+```python
 sc_10 = SGDClassifier(
     loss='hinge',
     max_iter=10,
     random_state=42
 )
-
+```
 hinge는 선형 SVM 방식의 손실 함수이다.
 즉, 같은 SGDClassifier를 사용하더라도 loss 값을 어떻게 설정하느냐에 따라 모델의 학습 방식이 달라진다.
 
 먼저 에포크 수를 10으로 설정한 모델을 훈련하였다.
-
+```python
 sc_10.fit(train_scaled, train_target)
-
+```
 그 후 훈련 세트와 테스트 세트의 정확도를 확인하였다.
-
+```python
 sc_10.score(train_scaled, train_target)
 sc_10.score(test_scaled, test_target)
-8. 에포크 수에 따른 정확도 변화
+```
+
+## 8. 에포크 수에 따른 정확도 변화
 
 다음으로 에포크 수를 300까지 늘려가며 매 에포크마다 훈련 정확도와 테스트 정확도를 기록하였다.
-
+```python
 train_score = []
 test_score = []
 
@@ -171,22 +174,22 @@ for epoch in range(300):
     sc.partial_fit(train_scaled, train_target, classes=classes)
     train_score.append(sc.score(train_scaled, train_target))
     test_score.append(sc.score(test_scaled, test_target))
-
+```
 여기서 partial_fit()은 모델을 한 번에 끝까지 학습시키는 것이 아니라, 조금씩 이어서 학습시키는 역할을 한다.
 
 처음 partial_fit()을 사용할 때는 전체 클래스 목록을 알려줘야 하기 때문에 classes 값을 함께 넣어주었다.
-
+```python
 classes = np.unique(train_target)
-
+```
 이후 에포크마다 훈련 점수와 테스트 점수를 리스트에 저장하고, 그래프로 확인하였다.
-
+```python
 plt.plot(train_score, label='train score')
 plt.plot(test_score, label='test score')
 plt.xlabel('epoch')
 plt.ylabel('accuracy')
 plt.legend()
 plt.show()
-
+```
 그래프를 보면 에포크가 증가하면서 정확도가 계속 변하는 것을 확인할 수 있다.
 이때 훈련 점수만 보는 것이 아니라 테스트 점수도 함께 봐야 한다.
 
@@ -195,10 +198,10 @@ plt.show()
 
 따라서 적절한 에포크 수를 찾는 것이 중요하다.
 
-9. 에포크 10 모델과 선택한 에포크 모델 비교
+## 9. 에포크 10 모델과 선택한 에포크 모델 비교
 
 에포크 10으로 학습한 모델과 그래프를 보고 선택한 에포크 수로 학습한 모델의 정확도를 비교하였다.
-
+```python
 sc_best = SGDClassifier(
     loss='hinge',
     max_iter=best_epoch,
@@ -207,17 +210,17 @@ sc_best = SGDClassifier(
 )
 
 sc_best.fit(train_scaled, train_target)
-
+```
 그리고 두 모델의 테스트 정확도를 비교하였다.
-
+```python
 print(sc_10.score(test_scaled, test_target))
 print(sc_best.score(test_scaled, test_target))
-
+```
 이 과정을 통해 모델을 너무 적게 학습시키면 성능이 부족할 수 있고, 그렇다고 무조건 많이 학습시키는 것이 정답도 아니라는 것을 알 수 있었다.
 
 모델 학습에서는 적절한 반복 횟수를 찾는 것이 중요하며, 이를 위해 훈련 점수와 테스트 점수의 변화를 함께 확인해야 한다.
 
-10. 정리
+## 10. 정리
 
 이번 주차에서 배운 내용을 정리하면 다음과 같다.
 
@@ -231,6 +234,7 @@ loss='hinge'를 사용하면 선형 SVM 방식의 손실 함수를 사용한다.
 에포크 수가 너무 작으면 과소적합이 발생할 수 있다.
 에포크 수가 너무 크면 과대적합이 발생할 수 있다.
 그래프를 보고 적절한 에포크 수를 선택하는 과정이 필요하다.
+
 11. 느낀점
 
 이번 주차에서는 로지스틱 회귀와 SGDClassifier를 사용해서 생선 분류 문제를 해결하였다.
