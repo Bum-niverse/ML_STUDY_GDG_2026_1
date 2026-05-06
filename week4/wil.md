@@ -29,19 +29,21 @@
 
 ```python
 from sklearn.linear_model import LogisticRegression
+```
 
 로지스틱 회귀는 입력 데이터를 바탕으로 각 클래스에 속할 확률을 계산하고, 그중 가장 확률이 높은 클래스를 최종 예측값으로 선택한다.
 
 즉, 단순히 "이 생선은 Bream이다"라고만 알려주는 것이 아니라, 각 생선 종류별로 어느 정도의 확률을 가지는지도 확인할 수 있다.
-
+```python
 lr.predict(test_data_scaled)
 lr.predict_proba(test_data_scaled)
+```
 
 여기서 predict()는 최종 예측 결과를 출력하고, predict_proba()는 각 클래스별 확률을 출력한다.
 
 이번 과제에서는 새로운 생선 데이터 5개를 넣고, 각각 어떤 생선으로 예측되는지와 7종의 생선에 대한 확률을 확인하였다.
 
-3. 데이터 준비
+##3. 데이터 준비
 
 이번 실습에서는 fish_csv_data 데이터를 사용하였다.
 
