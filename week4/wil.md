@@ -1,4 +1,4 @@
-# Week 4 Assignment - 로지스틱 회귀와 SGD
+# 🐟Week 4 Assignment - 로지스틱 회귀와 SGD
 
 ## 1. 목표
 
